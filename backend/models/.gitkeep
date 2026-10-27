@@ -1,0 +1,3 @@
+# This directory stores trained ML model artifacts
+# churn_model.pkl — saved by train_churn_model.py
+# shap_explainer.pkl — saved by train_churn_model.py

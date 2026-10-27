@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+@theme {
+  --color-ink: #14213D;
+  --color-paper: #FAF7F3;
+  --color-amber: #E8A33D;
+  --color-teal: #1F9D82;
+  --color-rose: #D14D4D;
+  --color-ink-muted: #5B6472;
+  --color-line: #E3DDD3;
+
+  --font-display: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-serif: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-sans: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+:root {
+  --background: #FAF7F3;
+  --foreground: #14213D;
+}
+
+body {
+  background-color: #FAF7F3;
+  color: #14213D;
+  font-family: var(--font-sans);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+}
+
+/* Custom hairline borders style for case-file aesthetic */
+.case-border {
+  border: 1px solid var(--color-line);
+}
+
+.case-border-b {
+  border-bottom: 1px solid var(--color-line);
+}
+
+.case-border-t {
+  border-top: 1px solid var(--color-line);
+}
+
+.case-border-r {
+  border-right: 1px solid var(--color-line);
+}
+
+.case-border-l {
+  border-left: 1px solid var(--color-line);
+}
+
+/* Risk Left Accents */
+.risk-accent-rose {
+  border-left: 4px solid #D14D4D;
+}
+
+.risk-accent-amber {
+  border-left: 4px solid #E8A33D;
+}
+
+.risk-accent-teal {
+  border-left: 4px solid #1F9D82;
+}
+
+/* Focus Ring Custom */
+*:focus-visible {
+  outline: 2px solid #14213D;
+  outline-offset: 2px;
+}
+
+/* Hide Next.js dev indicator */
+nextjs-portal,
+[data-nextjs-dev-indicator],
+#nextjs-dev-tools-indicator {
+  display: none !important;
+}

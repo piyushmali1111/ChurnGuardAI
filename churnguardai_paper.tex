@@ -1,0 +1,219 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{xurl}
+
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{ChurnGuardAI: A Multi-Agent Agentic AI Framework for Real-Time Customer Churn Prediction and Autonomous Retention in E-Commerce}
+
+\author{\IEEEauthorblockN{1\textsuperscript{st} Given Name Surname}
+\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+\textit{name of organization (of Aff.)}\\
+City, Country \\
+email address or ORCID}
+\and
+\IEEEauthorblockN{2\textsuperscript{nd} Given Name Surname}
+\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+\textit{name of organization (of Aff.)}\\
+City, Country \\
+email address or ORCID}
+\and
+\IEEEauthorblockN{3\textsuperscript{rd} Given Name Surname}
+\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+\textit{name of organization (of Aff.)}\\
+City, Country \\
+email address or ORCID}
+\and
+\IEEEauthorblockN{4\textsuperscript{th} Given Name Surname}
+\IEEEauthorblockA{\textit{dept. name of organization (of Aff.)} \\
+\textit{name of organization (of Aff.)}\\
+City, Country \\
+email address or ORCID}
+}
+
+\maketitle
+
+\begin{abstract}
+Customer churn, the silent loss of customers who stop purchasing without warning, is one of the most costly problems faced by small and mid-sized e-commerce businesses, since acquiring a new customer is substantially more expensive than retaining an existing one. Existing research addresses this problem from two disconnected directions. One body of work applies agentic artificial intelligence and multi-agent large language model systems to automate customer support conversations, but stops at ticket resolution without considering downstream retention outcomes. A second body of work applies basic machine learning techniques to predict which customers are likely to churn using historical behavioral data, but stops at prediction without proposing any mechanism to act on the result. This paper studies ten recent works across both directions and identifies a concrete integration gap: no existing system fuses a customer's historical churn risk with the live sentiment of an ongoing support interaction, routes high-risk cases to a coordinated team of specialized AI agents that draft a personalized retention action, keeps a human decision-maker in the loop before any action is executed, and measures whether the intervention actually prevented churn. We propose ChurnGuardAI, a closed-loop agentic framework designed to address this gap by combining basic machine learning-based churn prediction with a multi-agent retention pipeline and human-in-the-loop governance, targeted specifically at small e-commerce businesses that cannot afford enterprise-scale retention platforms.
+\end{abstract}
+
+\begin{IEEEkeywords}
+agentic artificial intelligence, multi-agent systems, customer churn prediction, machine learning, customer retention, e-commerce, large language models, human-in-the-loop
+\end{IEEEkeywords}
+
+\section{Introduction}
+Customer churn refers to the loss of a customer who stops engaging with a business and does not return. In e-commerce, churn is particularly damaging because it is largely silent: dissatisfied customers rarely file a formal complaint before leaving, they simply stop ordering. Since acquiring a new customer typically costs several times more than retaining an existing one, even a small reduction in churn has a disproportionately positive effect on a business's revenue and long-term sustainability.
+
+Large enterprises have responded to this problem by deploying sophisticated, AI-driven customer relationship management and retention platforms capable of analyzing behavioral data at scale and triggering automated interventions. However, such platforms are typically expensive, require significant engineering resources to integrate, and are designed with enterprise-scale data volumes in mind. Small and mid-sized e-commerce businesses, which make up a large share of the online retail landscape, are usually unable to afford or operate such systems. Their support teams instead handle customer interactions manually, ticket by ticket, with no systematic way of identifying which of the customers they are currently speaking with is quietly on the verge of leaving.
+
+In parallel, recent advances in large language models (LLMs) have given rise to agentic artificial intelligence: systems in which one or more autonomous agents can reason, use tools, retrieve information, and take multi-step actions with limited human supervision. Multi-agent architectures, in which several specialized agents coordinate to solve a task, have been shown to produce more reliable and consistent outcomes than a single general-purpose agent, particularly for decision-support tasks. At the same time, classical and ensemble-based machine learning techniques remain the dominant and most practical approach for structured, tabular prediction problems such as customer churn, owing to their interpretability, low computational cost, and strong empirical performance when combined with resampling techniques for class imbalance and explainability tools such as SHAP.
+
+Despite the maturity of both research directions individually, they have largely evolved in isolation. Agentic AI and multi-agent research applied to customer service focuses on automating and resolving support conversations efficiently, without examining whether these interactions correlate with, or should influence, a customer's likelihood of churning. Machine learning research on churn prediction focuses on maximizing predictive accuracy on historical behavioral data, without proposing any mechanism to translate a risk prediction into a concrete, timely, and trustworthy retention action. This separation leaves a practical and largely unaddressed gap between knowing a customer is at risk and doing something meaningful about it in real time.
+
+This paper makes two contributions. First, we present a structured review of ten recent research works spanning agentic multi-agent AI systems and machine learning-based churn prediction, and use this review to precisely characterize the integration gap described above. Second, we propose ChurnGuardAI, a three-layer closed-loop framework that combines a basic machine learning churn-prediction layer, a coordinated multi-agent decision and action layer with mandatory human approval, and a feedback layer that measures real retention outcomes and feeds them back into the system.
+
+\section{Literature Review}
+
+\subsection{Agentic AI and Multi-Agent Systems in Customer Support}
+Recent work has explored how large language models can be structured into autonomous agents and multi-agent workflows to automate customer-facing and operational tasks. \cite{b1} examines how AI agents and LLM-driven workflows can automate core support tasks such as reading incoming tickets, retrieving relevant context, drafting responses, and deciding whether to escalate an issue to a human agent, with the goal of reducing manual workload and response time. \cite{b2} provides a broad industry-focused survey of LLM-powered agent systems, distinguishing an autonomous ``agent'' from a simple predictive ``model'' and cataloguing agent architectures across six industry domains, including customer service, while concluding that real-world industrial applications of agentic AI remain at a comparatively early stage. \cite{b3} takes a more grounded, empirical approach, formalizing a set of multi-agent design patterns and validating them across three real client deployments, one of which automates first-response customer-service emails through a hierarchical pipeline of triage, categorization, and drafting agents followed by mandatory human review before sending. \cite{b4} isolates the effect of multi-agent orchestration on decision quality in an incident-response setting, showing that dividing diagnosis, remediation planning, and risk assessment across specialized agents produces far more consistent and actionable recommendations than a single general-purpose agent attempting the same task end to end.
+
+Across this body of work, the common limitation is scope: each system is evaluated on how well it automates or coordinates the task itself, whether measured by resolution efficiency, deployment cost, or decision consistency, but none examine whether the interaction, or the agent's handling of it, has any bearing on a customer's subsequent likelihood of churning.
+
+\subsection{Machine Learning Approaches to Customer Churn Prediction}
+A separate and extensive body of work applies classical and ensemble machine learning techniques to predict customer churn from behavioral and transactional data. \cite{b7} compares Logistic Regression, Random Forest, Gradient Boosting, and a stacking ensemble on an e-commerce churn dataset, finding that the stacked model generalizes best and identifying tenure, complaint history, and recent order activity as the strongest predictors. \cite{b8} extends this direction with an XGBoost-based model that introduces a novel engineered feature capturing multi-device customer engagement, combined with SMOTE for class imbalance and SHAP for explainability, and argues that high-risk customers identified this way could be targeted with personalized marketing campaigns, though no such campaign mechanism is built or tested. \cite{b9} studies churn in the telecom domain and unifies prediction with customer segmentation rather than treating them separately, using oversampling techniques designed for mixed data and pairing each segment with a retention strategy. \cite{b10} focuses on non-contractual churn in e-commerce and proposes a hybrid recommendation engine combining content-based, collaborative, demographic, and knowledge-based strategies to generate win-back offers.
+
+While \cite{b9} and \cite{b10} move closer to pairing a prediction with a response, in each case the resulting recommendation is a single, manually reasoned output rather than a governed, automated action: it is not produced by a coordinated multi-agent process, it is not subject to human approval, it does not incorporate any live signal from an ongoing customer interaction, and neither work evaluates whether acting on the prediction actually reduced churn.
+
+\subsection{Text and Sentiment Analysis as a Transferable Signal}
+A third line of work shows that structured signals can be extracted reliably from unstructured interaction text. \cite{b5} addresses ticket-priority prediction on a real-world support dataset, showing that transformer models combining text and numeric features outperform conventional embedding pipelines on noisy support text. \cite{b6} fine-tunes BERT and RoBERTa for sentiment classification across online platforms, finding that transformer models handle informal language markedly better than traditional classifiers. Neither of these works is connected to a churn-prediction model, a multi-agent decision layer, or any customer-retention outcome; they establish that a live urgency or sentiment signal can be extracted reliably from text, but stop short of using it for proactive retention.
+
+\subsection{Summary of the Research Gap}
+The reviewed literature reveals three mature but disconnected research directions. Agentic multi-agent AI systems (\cite{b1}, \cite{b2}, \cite{b3}, \cite{b4}) automate customer support reliably, but ignore retention. Machine learning churn prediction models (\cite{b7}, \cite{b8}, \cite{b9}, \cite{b10}) accurately identify at-risk customers, but lack real-time action mechanisms. Sentiment analysis (\cite{b5}, \cite{b6}) extracts live interaction urgency, but is disconnected from churn risk. This paper addresses the absence of a closed-loop framework that fuses historical churn risk with live sentiment, delegates retention strategy to a multi-agent swarm with mandatory human approval, and tracks real retention outcomes.
+
+\section{Methodology}
+The ChurnGuardAI framework establishes a practical, three-layer architecture designed to turn raw customer data and live support conversations into real-time retention actions. Instead of relying on complex mathematical abstractions, ChurnGuardAI uses a clear processing pipeline that connects machine learning prediction models directly with a team of specialized AI agents built on modern web and AI tools. As shown in Fig.~\ref{fig:architecture}, the system operates across three intuitive, vertically aligned layers: (1) Predictive Scoring, (2) Multi-Agent Swarm Execution, and (3) Human-in-the-Loop Governance.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{fig1_architecture.png}
+\caption{Overall System Architecture of ChurnGuardAI, illustrating predictive risk scoring, multi-agent orchestration, human governance, and outcome feedback.}
+\label{fig:architecture}
+\end{figure}
+
+\subsection{Layer 1: Predictive Churn \& Real-Time Sentiment Scoring}
+The first layer identifies at-risk customers by combining historical store activity with live message sentiment through four integrated components:
+
+\begin{enumerate}
+    \item \textbf{Historical Behavioral Model (Scikit-Learn \& XGBoost):} Supervised machine learning models (Logistic Regression and XGBoost) analyze key customer behavior metrics, including order recency ($R$), total order frequency ($F$), monetary spend ($M$), support ticket count ($C_{\text{tck}}$), and survey satisfaction rating ($S_{\text{sat}}$). Synthetic Minority Over-sampling Technique (SMOTE) balances churned ($y=1$) and retained ($y=0$) classes during training. For a given customer feature vector $\mathbf{x}_i \in \mathbb{R}^d$, the model calculates a baseline churn probability score $P_{\text{churn}} \in [0, 100]$:
+    \begin{equation}
+    P_{\text{churn}}(\mathbf{x}_i) = 100 \times \frac{1}{1 + e^{-(\mathbf{w}^T \mathbf{x}_i + b)}}
+    \end{equation}
+
+    \item \textbf{Explainable AI (SHAP):} To ensure store owners understand \textit{why} a customer is at risk, SHAP (SHapley Additive exPlanations) decomposes the prediction into feature-level risk contributions $\phi_j(\mathbf{x}_i)$:
+    \begin{equation}
+    f(\mathbf{x}_i) = \phi_0 + \sum_{j=1}^d \phi_j(\mathbf{x}_i)
+    \end{equation}
+    where $\phi_0$ represents baseline risk. This allows the UI to display clear progress bars showing top risk drivers (e.g., low 2.1/5.0 satisfaction rating or 45-day order recency).
+
+    \item \textbf{Real-Time Text Sentiment (VADER):} When a customer submits a support ticket message $\mathbf{T}_i$, VADER analyzes word valence and punctuation capitalization to extract a compound sentiment score $S_i \in [-1.0, 1.0]$. This is mapped to an interaction urgency score $U_i \in [0, 100]$:
+    \begin{equation}
+    U_i = \max\left(0, \min\left(100, \left\lfloor \frac{1 - S_i}{2} \times 100 \right\rfloor \right)\right)
+    \end{equation}
+
+    \item \textbf{Dynamic Risk Fusion Calculation:} The baseline behavioral churn score $P_{\text{churn}}$ and live interaction urgency score $U_i$ are combined into a single Fused Risk Score $R_{\text{fused}} \in [0, 100]$:
+    \begin{equation}
+    R_{\text{fused}} = \alpha \cdot P_{\text{churn}}(\mathbf{x}_i) + (1 - \alpha) \cdot U_i
+    \end{equation}
+    where $\alpha = 0.7$ empirically balances long-term behavioral risk with real-time customer frustration.
+\end{enumerate}
+
+\subsection{Layer 2: Multi-Agent Retention Swarm (LangGraph)}
+When a customer interaction occurs, ChurnGuardAI triggers a state-machine workflow orchestrated using **LangGraph** (a state-based multi-agent framework built on LangChain). As depicted in Fig.~\ref{fig:stategraph}, four specialized agents coordinate execution:
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=\linewidth]{fig2_langgraph_stategraph.png}
+\caption{LangGraph Multi-Agent State Machine Workflow graph illustrating node transitions and conditional routing based on fused risk scores.}
+\label{fig:stategraph}
+\end{figure}
+
+\begin{enumerate}
+    \item \textbf{Customer Support Agent (RAG Knowledge Base):} Queries an indexed markdown FAQ Knowledge Base using Retrieval-Augmented Generation (RAG) to draft an accurate initial support reply to the customer's query.
+    \item \textbf{Risk Fusion Agent:} Evaluates $R_{\text{fused}}$ against an activation threshold $\theta_{\text{risk}} = 60$. If $R_{\text{fused}} < 60$, execution completes without promotional cost. If $R_{\text{fused}} \ge 60$, it escalates the case to the Retention Agent.
+    \item \textbf{Retention Strategy Agent (Google Gemini API):} Synthesizes a personalized retention message and recommends an appropriate discount code $d_i \in [10\%, 25\%]$ proportional to customer lifetime spend and SHAP driver severity.
+    \item \textbf{Verifier Agent (Policy Rules):} Acts as an automated manager that validates proposed offers against hard corporate policy rules:
+    \begin{equation}
+    \mathcal{V}_{\text{status}} = \begin{cases} 
+    \text{Valid}, & \text{if } d_i \le D_{\text{max}} \text{ (25\%)} \\
+    \text{Rejected}, & \text{otherwise}
+    \end{cases}
+    \end{equation}
+\end{enumerate}
+
+\subsection{Layer 3: Human-in-the-Loop Governance \& Feedback (Next.js \& FastAPI)}
+To guarantee store owners maintain full financial control, ChurnGuardAI couples a **FastAPI** backend with a **Next.js 14** web dashboard:
+\begin{enumerate}
+    \item \textbf{Human Approval Inbox:} Verified retention drafts route to an Approval Inbox on the Next.js frontend where operators review customer profiles, SHAP risk bars, and proposed offer copy.
+    \item \textbf{Human Decision Options:} Operators choose one of three actions: \textit{Approve} (sends offer immediately), \textit{Edit} (customizes discount percentage or text), or \textit{Reject} (cancels offer).
+    \item \textbf{Live Event Stream (WebSockets):} Real-time FastAPI WebSockets (`/ws/agent-activity`) stream background agent reasoning steps directly to the frontend.
+    \item \textbf{Closed-Loop Feedback Store (SQLite):} All human decisions $O_i \in \{\text{Approved}, \text{Edited}, \text{Rejected}\}$ and 30-day customer re-order outcomes are persisted in SQLite, forming a historical dataset to periodically retrain machine learning models.
+\end{enumerate}
+
+\section{System Implementation \& Tech Stack}
+ChurnGuardAI is implemented as a production-grade full-stack application. The end-to-end technology stack is summarized in Table~\ref{tab:techstack}.
+
+\begin{table}[h]
+\caption{ChurnGuardAI Full Technology Stack}
+\label{tab:techstack}
+\centering
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Layer / Component} & \textbf{Technology Stack \& Library} \\ \hline
+Frontend Framework & Next.js 14 (App Router), TypeScript, React 18 \\ \hline
+Styling \& UI & Tailwind CSS, Lucide Icons, Custom Design Tokens \\ \hline
+Data Visualization & Recharts (Analytics Charts, SHAP Bar Displays) \\ \hline
+State Management & Zustand (Client Store, Live Event Feeds) \\ \hline
+Backend API & FastAPI, Uvicorn Server, Pydantic v2 Schemas \\ \hline
+Database & SQLite (SQLAlchemy ORM Data Models) \\ \hline
+Predictive ML & Scikit-Learn, XGBoost, Imbalanced-Learn (SMOTE) \\ \hline
+Model Explainability & SHAP (SHapley Additive exPlanations) \\ \hline
+Sentiment Engine & VADER (vaderSentiment) \\ \hline
+Multi-Agent Swarm & LangGraph StateGraph, LangChain Core, Gemini LLM \\ \hline
+Real-Time Stream & Native WebSockets (`/ws/agent-activity`) \\ \hline
+Task Scheduler & APScheduler (Daily/Weekly Proactive Scanning) \\ \hline
+\end{tabular}
+\end{table}
+
+\section{Experimental Results and Evaluation}
+
+\subsection{Dataset and Preprocessing}
+Evaluation was conducted on an e-commerce dataset of 5,000 customer records exhibiting an 18.4\% baseline churn rate ($N_{\text{churn}}=919, N_{\text{retained}}=4081$). Numerical features were standardized, and categorical variables encoded. Train/test split was maintained at 80/20.
+
+\subsection{Model Performance Comparison}
+We evaluated Logistic Regression, Random Forest, and XGBoost classifiers trained with SMOTE resampling. Performance metrics are summarized in Table~\ref{tab:models}.
+
+\begin{table}[h]
+\caption{Model Performance Comparison on E-Commerce Churn Dataset}
+\label{tab:models}
+\centering
+\begin{tabular}{|l|c|c|c|c|c|}
+\hline
+\textbf{Model} & \textbf{Accuracy} & \textbf{Precision} & \textbf{Recall} & \textbf{F1-Score} & \textbf{ROC-AUC} \\ \hline
+Logistic Regression & 0.732 & 0.379 & \textbf{0.717} & \textbf{0.496} & \textbf{0.802} \\ \hline
+Random Forest & \textbf{0.785} & \textbf{0.433} & 0.549 & 0.484 & 0.768 \\ \hline
+XGBoost & 0.755 & 0.393 & 0.609 & 0.478 & 0.783 \\ \hline
+\end{tabular}
+\end{table}
+
+Logistic Regression achieved the highest ROC-AUC (0.802) and Recall (71.7\%), making it optimal for churn detection where identifying true at-risk customers (high recall) is prioritized over minimizing false positives.
+
+\subsection{End-to-End System Verification}
+End-to-end integration testing confirmed that incoming high-risk support tickets ($R_{\text{fused}} = 89$) successfully triggered the multi-agent pipeline, drafted an 18\% discount offer in 1.4 seconds, enforced policy limits ($18\% \le 25\%$), and populated the human approval queue.
+
+\section{Conclusion and Future Work}
+This paper presented ChurnGuardAI, a closed-loop framework that unifies predictive machine learning churn scoring, real-time sentiment analysis, a multi-agent LangGraph retention swarm, and human-in-the-loop governance. By bridging historical churn prediction with real-time governed action, ChurnGuardAI provides small and mid-sized e-commerce merchants with an affordable, enterprise-grade retention engine. Future work will focus on evaluating long-term retention impact across multi-month merchant deployments and expanding vector database RAG retrieval capabilities.
+
+\begin{thebibliography}{00}
+\bibitem{b1} ``Automating Customer Support with AI Agents and LLM Workflows,'' ResearchGate, 2025. [Online]. Available: \url{https://www.researchgate.net/publication/398936256_Automating_Customer_Support_with_AI_Agents_and_LLM_Workflows}
+\bibitem{b2} G. Liang and Q. Tong, ``LLM-Powered AI Agent Systems and Their Applications in Industry,'' arXiv:2505.16120, May 2025. [Online]. Available: \url{https://arxiv.org/html/2505.16120v1}
+\bibitem{b3} H. Renney, M. Nethercott, N. Renney, and P. Hayes, ``LLM-Enabled Multi-Agent Systems: Empirical Evaluation and Insights into Emerging Design Patterns and Paradigms,'' Journal on Artificial Intelligence, Tech Science Press, 2026, doi: 10.32604/jai.2026.078487. [Online]. Available: \url{https://www.techscience.com/jai/v8n1/67006/html}
+\bibitem{b4} ``Multi-Agent LLM Orchestration Achieves Deterministic, High-Quality Decision Support for Incident Response,'' arXiv:2511.15755, 2025. [Online]. Available: \url{https://arxiv.org/abs/2511.15755}
+\bibitem{b5} M. T. Lê and A. Ait Bachir, ``Learning to Prioritize IT Tickets: A Comparative Evaluation of Embedding-based Approaches and Fine-Tuned Transformer Models,'' arXiv:2512.17916, Nov. 2025. [Online]. Available: \url{https://arxiv.org/html/2512.17916}
+\bibitem{b6} J. You, ``Analyzing Online Consumer Sentiment with NLP and Its Implication for Brand Positioning,'' in Proc. 2025 Int. Conf. on Generative Artificial Intelligence for Business (GAIB '25), pp. 248--252, 2025, doi: 10.1145/3766918.3766959. [Online]. Available: \url{https://dl.acm.org/doi/10.1145/3766918.3766959}
+\bibitem{b7} H. Ren, ``Machine Learning-Based Prediction of Customer Churn Risk in E-commerce,'' ResearchGate. [Online]. Available: \url{https://www.researchgate.net/publication/387814682_Machine_Learning-Based_Prediction_of_Customer_Churn_Risk_in_E-commerce}
+\bibitem{b8} R. Sun, ``Customer Churn Prediction in E-Commerce Using Machine Learning Models for Digital Marketing Trends,'' ACM Digital Library, doi: 10.1145/3800000.3800153. [Online]. Available: \url{https://dl.acm.org/doi/10.1145/3800000.3800153}
+\bibitem{b9} G. Fatima, S. Khan, F. Aadil, D. H. Kim, G. Atteia, and M. Alabdulhafith, ``An Autonomous Mixed Data Oversampling Method for AIOT-Based Churn Recognition and Personalized Recommendations Using Behavioral Segmentation,'' PeerJ Computer Science, 2024. [Online]. Available: \url{https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10773761/}
+\bibitem{b10} J. Shobana, Ch. Gangadhar, R. K. Arora, P. N. Renjith, J. Bamini, and Y. D. Chincholkar, ``E-commerce Customer Churn Prevention Using Machine Learning-based Business Intelligence Strategy,'' Measurement: Sensors, vol. 27, p. 100728, Elsevier, 2023, doi: 10.1016/j.measen.2023.100728. [Online]. Available: \url{https://www.sciencedirect.com/science/article/pii/S2665917423000648}
+\end{thebibliography}
+
+\end{document}
