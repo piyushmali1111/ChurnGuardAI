@@ -10,6 +10,8 @@ class WeeklyTrendPoint(BaseModel):
 class DashboardSummaryResponse(BaseModel):
     total_customers: int
     high_risk_today: int
+    high_risk_total: Optional[int] = None
+    high_risk_new_today: Optional[int] = None
     retention_rate_30d: float
     retention_delta_vs_last_month: float
     pending_offers_count: int
@@ -29,10 +31,10 @@ class CustomerSummaryResponse(BaseModel):
     id: str
     name: str
     email: str
-    churn_risk_score: int
+    churn_risk_score: float
     baseline_score: Optional[int] = None
     urgency_score: Optional[int] = None
-    fused_score: Optional[int] = None
+    fused_score: Optional[float] = None
     churn_status: str
     last_order_date: str
     days_inactive: Optional[int] = None
@@ -54,7 +56,7 @@ class TicketResponse(BaseModel):
     sentiment_score: int
     urgency_score: Optional[int] = None
     baseline_score: Optional[int] = None
-    fused_score: Optional[int] = None
+    fused_score: Optional[float] = None
     agent_reply: Optional[str] = None
     created_at: str
 
@@ -68,7 +70,7 @@ class OfferResponse(BaseModel):
     reasoning: str
     baseline_score: Optional[int] = None
     urgency_score: Optional[int] = None
-    fused_score: Optional[int] = None
+    fused_score: Optional[float] = None
     status: str
     created_at: str
     decided_at: Optional[str] = None
@@ -91,6 +93,8 @@ class OfferPatchRequest(BaseModel):
     discount_percent: Optional[int] = None
 
 class ScanRunResponse(BaseModel):
+    scanned_customers: Optional[int] = None
+    high_risk_flagged: Optional[int] = None
     new_offers_count: int
     scan_timestamp: str
 

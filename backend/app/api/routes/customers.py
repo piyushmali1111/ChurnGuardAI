@@ -71,8 +71,8 @@ def list_customers(
         query = query.order_by(desc(Customer.last_order_date))
     elif sort == "date_asc":
         query = query.order_by(asc(Customer.last_order_date))
-    else:  # default risk_desc
-        query = query.order_by(desc(Customer.churn_risk_score))
+    else:  # default risk_desc: score desc, days since last order desc, total spent desc
+        query = query.order_by(desc(Customer.churn_risk_score), asc(Customer.last_order_date), desc(Customer.total_spent))
 
     offset = (page - 1) * page_size
     customers = query.offset(offset).limit(page_size).all()
@@ -122,6 +122,9 @@ def get_customer(customer_id: str, db: Session = Depends(get_db)):
         "TotalSpent": cust.total_spent,
         "ComplaintCount": cust.complaint_count,
         "SatisfactionScore": cust.satisfaction_score,
+        "TenureMonths": getattr(cust, "tenure_months", 12.0) or 12.0,
+        "ReturnRate": getattr(cust, "return_rate", 0.10) or 0.10,
+        "DiscountUsageRate": getattr(cust, "discount_usage_rate", 0.20) or 0.20,
     }
 
     baseline_score = cust.baseline_score or cust.churn_risk_score

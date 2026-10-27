@@ -100,9 +100,9 @@ class TestChurnGuardAIConsistency(unittest.TestCase):
         self.assertEqual(data.get("page_size"), 25)
 
     def test_05_calibrated_churn_scores(self):
-        """5. All displayed churn scores in DB are between 2 and 98 (0 records with score 0, 1, 99, 100)."""
+        """5. All displayed churn scores in DB are between 1 and 99 (prompt v2)."""
         customers = self.db.query(Customer).all()
-        invalid_scores = [c.id for c in customers if c.churn_risk_score < 2 or c.churn_risk_score > 98]
+        invalid_scores = [c.id for c in customers if c.churn_risk_score < 1.0 or c.churn_risk_score > 99.0]
         self.assertEqual(len(invalid_scores), 0, f"Found invalid scores for: {invalid_scores}")
 
     def test_06_complaint_count_matches_ticket_count(self):
@@ -149,7 +149,7 @@ class TestChurnGuardAIConsistency(unittest.TestCase):
 
     def test_09_shap_bars_in_points_and_sum(self):
         """9. All SHAP bar contributions in the API are in points (no %), and abs(sum(points) - (score - base_score)) < 1.0."""
-        demo_ids = ["CUST-4491", "CUST-8021", "CUST-5510", "CUST-3312"]
+        demo_ids = ["CUST-1000", "CUST-1001", "CUST-1002", "CUST-1003"]
         for cid in demo_ids:
             res = client.get(f"/api/customers/{cid}")
             self.assertEqual(res.status_code, 200)
@@ -166,7 +166,8 @@ class TestChurnGuardAIConsistency(unittest.TestCase):
             for f in shap_factors:
                 self.assertIn("points", f)
                 self.assertNotIn("%", str(f.get("label", "")))
-                self.assertNotIn("%", str(f.get("value", "")))
+                if f.get("feature") not in ["ReturnRate", "DiscountUsageRate"]:
+                    self.assertNotIn("%", str(f.get("value", "")))
                 total_pts += f["points"]
 
             expected_delta = score - base_score

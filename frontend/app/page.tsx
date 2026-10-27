@@ -49,8 +49,10 @@ export default function DashboardPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const sum = await api.getDashboardSummary();
-      const offers = await api.getPendingOffers();
+      const [sum, offers] = await Promise.all([
+        api.getDashboardSummary(),
+        api.getPendingOffers(),
+      ]);
       setSummary(sum);
       setPendingOffers(offers.slice(0, 5));
     } catch (err) {

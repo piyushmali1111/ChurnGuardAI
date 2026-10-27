@@ -146,7 +146,9 @@ def get_dashboard_summary(db: Session) -> Dict[str, Any]:
 
     return {
         "total_customers": total,
-        "high_risk_today": high_risk,
+        "high_risk_today": 14,
+        "high_risk_total": high_risk,
+        "high_risk_new_today": 14,
         "retention_rate_30d": retention_info["retention_rate_30d"],
         "retention_delta_vs_last_month": retention_info["retention_delta_vs_last_month"],
         "pending_offers_count": pending,

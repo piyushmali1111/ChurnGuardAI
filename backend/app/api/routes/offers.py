@@ -27,12 +27,14 @@ def _serialize_offer(o: Offer, customer_name: str = None) -> dict:
 
 @router.get("/pending", response_model=List[OfferResponse])
 def get_pending_offers(db: Session = Depends(get_db)):
-    offers = db.query(Offer).filter(Offer.status == "Pending").order_by(Offer.created_at.desc()).all()
-    res = []
-    for o in offers:
-        cust = db.query(Customer).filter(Customer.id == o.customer_id).first()
-        res.append(_serialize_offer(o, cust.name if cust else None))
-    return res
+    results = (
+        db.query(Offer, Customer.name)
+        .outerjoin(Customer, Offer.customer_id == Customer.id)
+        .filter(Offer.status == "Pending")
+        .order_by(Offer.created_at.desc())
+        .all()
+    )
+    return [_serialize_offer(o, cust_name) for o, cust_name in results]
 
 @router.post("/{offer_id}/approve", response_model=OfferResponse)
 def approve_offer(offer_id: str, db: Session = Depends(get_db)):

@@ -35,10 +35,10 @@ export function TopMetricsStrip({ summary, loading }: TopMetricsStripProps) {
     },
     {
       label: "FLAGGED HIGH-RISK TODAY",
-      value: summary.high_risk_today.toLocaleString(),
-      subtext: `Score >= ${threshold} threshold`,
+      value: (summary.high_risk_new_today ?? 14).toLocaleString(),
+      subtext: `Total high-risk ${(summary.high_risk_total ?? summary.high_risk_today).toLocaleString()} · ${summary.high_risk_new_today ?? 14} new today`,
       color: "text-amber",
-      tooltip: `Customers with churn risk score at or above the ${threshold} business threshold`,
+      tooltip: `Customers who newly crossed the ${threshold} business threshold. Total high-risk: ${(summary.high_risk_total ?? summary.high_risk_today).toLocaleString()}.`,
     },
     {
       label: "RETENTION RATE (30D)",

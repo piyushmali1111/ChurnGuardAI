@@ -22,15 +22,20 @@ def compute_days_inactive(last_order_str: str) -> int:
         return 30
 
 @router.get("", response_model=List[TicketResponse])
-def list_tickets(db: Session = Depends(get_db)):
-    tickets = db.query(Ticket).order_by(Ticket.created_at.desc()).all()
+def list_tickets(limit: int = 100, db: Session = Depends(get_db)):
+    results = (
+        db.query(Ticket, Customer.name)
+        .outerjoin(Customer, Ticket.customer_id == Customer.id)
+        .order_by(Ticket.created_at.desc())
+        .limit(limit)
+        .all()
+    )
     res = []
-    for t in tickets:
-        cust = db.query(Customer).filter(Customer.id == t.customer_id).first()
+    for t, cust_name in results:
         res.append({
             "id": t.id,
             "customer_id": t.customer_id,
-            "customer_name": cust.name if cust else None,
+            "customer_name": cust_name,
             "message": t.message,
             "sentiment_label": t.sentiment_label,
             "sentiment_score": t.sentiment_score,

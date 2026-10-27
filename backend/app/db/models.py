@@ -18,17 +18,22 @@ class Customer(Base):
     id = Column(String, primary_key=True, index=True)
     name = Column(String, nullable=False)
     email = Column(String, nullable=False, index=True)
-    signup_date = Column(String, nullable=False)
-    last_order_date = Column(String, nullable=False)
+    signup_date = Column(String, nullable=False, index=True)
+    last_order_date = Column(String, nullable=False, index=True)
     order_count = Column(Integer, default=0)
     total_spent = Column(Float, default=0.0)
     complaint_count = Column(Integer, default=0)
     satisfaction_score = Column(Float, default=5.0)
-    churn_risk_score = Column(Integer, default=0)
+    tenure_months = Column(Float, default=0.0)
+    return_rate = Column(Float, default=0.0)
+    discount_usage_rate = Column(Float, default=0.0)
+    churn_risk_score = Column(Float, default=0.0, index=True)
+    model_version = Column(String, default="v2-calibrated-xgb", nullable=True)
+    scored_at = Column(DateTime, default=datetime.utcnow, nullable=True)
     baseline_score = Column(Integer, nullable=True)
     urgency_score = Column(Integer, nullable=True)
     fused_score = Column(Integer, nullable=True)
-    churn_status = Column(String, default="Safe") # Safe, Watching, High Risk
+    churn_status = Column(String, default="Safe", index=True) # Safe, Watching, High Risk
 
     tickets = relationship("Ticket", back_populates="customer", cascade="all, delete-orphan")
     offers = relationship("Offer", back_populates="customer", cascade="all, delete-orphan")
@@ -37,7 +42,7 @@ class Ticket(Base):
     __tablename__ = "tickets"
 
     id = Column(String, primary_key=True, index=True)
-    customer_id = Column(String, ForeignKey("customers.id"), nullable=False)
+    customer_id = Column(String, ForeignKey("customers.id"), nullable=False, index=True)
     message = Column(Text, nullable=False)
     sentiment_label = Column(String, nullable=False) # Angry, Neutral, Happy
     sentiment_score = Column(Integer, default=50) # 0-100 (urgency)
@@ -45,7 +50,7 @@ class Ticket(Base):
     baseline_score = Column(Integer, nullable=True)
     fused_score = Column(Integer, nullable=True)
     agent_reply = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
 
     customer = relationship("Customer", back_populates="tickets")
     offers = relationship("Offer", back_populates="ticket")
@@ -54,16 +59,16 @@ class Offer(Base):
     __tablename__ = "offers"
 
     id = Column(String, primary_key=True, index=True)
-    customer_id = Column(String, ForeignKey("customers.id"), nullable=False)
-    ticket_id = Column(String, ForeignKey("tickets.id"), nullable=True)
+    customer_id = Column(String, ForeignKey("customers.id"), nullable=False, index=True)
+    ticket_id = Column(String, ForeignKey("tickets.id"), nullable=True, index=True)
     drafted_message = Column(Text, nullable=False)
     discount_percent = Column(Integer, nullable=False)
     reasoning = Column(Text, nullable=False)
     baseline_score = Column(Integer, nullable=True)
     urgency_score = Column(Integer, nullable=True)
     fused_score = Column(Integer, nullable=True)
-    status = Column(String, default="Pending") # Pending, Approved, Rejected, Edited
-    created_at = Column(DateTime, default=datetime.utcnow)
+    status = Column(String, default="Pending", index=True) # Pending, Approved, Rejected, Edited
+    created_at = Column(DateTime, default=datetime.utcnow, index=True)
     decided_at = Column(DateTime, nullable=True)
 
     customer = relationship("Customer", back_populates="offers")
