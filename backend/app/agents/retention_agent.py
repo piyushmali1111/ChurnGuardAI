@@ -90,52 +90,37 @@ def run_retention_agent(
     api_key = settings.GEMINI_API_KEY
     drafted_message = None
 
-    if api_key:
+    if api_key and settings.ENABLE_LIVE_LLM:
         try:
             from google import genai
-            client = genai.Client(api_key=api_key)
-            prompt = f"""
-            You are a Retention AI Agent for ChurnGuardAI.
-            Draft a personalized win-back / retention offer message for this customer.
+            import concurrent.futures
 
-            ALLOWED FACTS:
-            {json.dumps(allowed_facts, indent=2)}
+            def _call_gemini_retention():
+                client = genai.Client(api_key=api_key)
+                return client.models.generate_content(
+                    model="gemini-3.8-flash",
+                    contents=prompt
+                )
 
-            OFFER TERMS:
-            - Proposed Discount: {target_discount}%
-            - Reason: {reasoning}
-
-            STRICT INSTRUCTIONS:
-            1. Use ONLY the facts provided above. Do NOT mention checkout errors, carts, discount-code problems, shipping carriers, or any event not listed in the facts.
-            2. Keep message warm, appreciative, concise and professional.
-            3. Propose the {target_discount}% courtesy discount code (GUARD{target_discount}-{customer_name.split()[0].upper()}).
-
-            Return JSON:
-            {{
-              "drafted_message": "..."
-            }}
-            """
-            response = client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=prompt
-            )
-            if response and response.text:
-                txt = response.text.strip()
-                if "{" in txt and "}" in txt:
-                    txt = txt[txt.find("{"):txt.rfind("}")+1]
-                data = json.loads(txt)
-                msg = data.get("drafted_message", "")
-                # Check for banned ungrounded words
-                allowed_str = json.dumps(allowed_facts).lower()
-                has_banned = False
-                for bw in BANNED_UNGROUNDED_WORDS:
-                    if bw in msg.lower() and bw not in allowed_str:
-                        has_banned = True
-                        break
-                if not has_banned and len(msg) >= 15:
-                    drafted_message = msg
-        except Exception as e:
-            print(f"[!] Retention Agent Gemini call failed: {e}. Falling back.")
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+                future = executor.submit(_call_gemini_retention)
+                response = future.result(timeout=2.0)
+                if response and response.text:
+                    txt = response.text.strip()
+                    if "{" in txt and "}" in txt:
+                        txt = txt[txt.find("{"):txt.rfind("}")+1]
+                    data = json.loads(txt)
+                    msg = data.get("drafted_message", "")
+                    allowed_str = json.dumps(allowed_facts).lower()
+                    has_banned = False
+                    for bw in BANNED_UNGROUNDED_WORDS:
+                        if bw in msg.lower() and bw not in allowed_str:
+                            has_banned = True
+                            break
+                    if not has_banned and len(msg) >= 15:
+                        drafted_message = msg
+        except Exception:
+            drafted_message = None
 
     if not drafted_message:
         code_str = customer_name.split()[0].upper() if customer_name else "VIP"

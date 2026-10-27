@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Ticket, CustomerDetail } from "../../lib/types";
 import { api } from "../../lib/api";
+import { formatLiveDateTime, formatRelativeTime } from "../../lib/formatters";
 import {
   Ticket as TicketIcon,
   Smile,
@@ -25,7 +26,7 @@ export default function TicketQueuePage() {
 
   // New ticket modal form state
   const [showNewModal, setShowNewModal] = useState(false);
-  const [selectedCustId, setSelectedCustId] = useState("CUST-4491");
+  const [selectedCustId, setSelectedCustId] = useState("CUST-1000");
   const [ticketMessage, setTicketMessage] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
@@ -162,7 +163,7 @@ export default function TicketQueuePage() {
                     <div className="flex items-center justify-between text-xs">
                       <span className="font-semibold text-ink">{tck.customer_name || tck.customer_id}</span>
                       <span className="text-xs text-ink-muted font-mono">
-                        {new Date(tck.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                        {formatRelativeTime(tck.created_at)}
                       </span>
                     </div>
 
@@ -196,7 +197,7 @@ export default function TicketQueuePage() {
                       </h2>
                     </div>
                     <p className="text-xs text-ink-muted mt-1 font-mono">
-                      Created: {new Date(selectedTicket.created_at).toLocaleString()}
+                      Created: {formatLiveDateTime(selectedTicket.created_at)} ({formatRelativeTime(selectedTicket.created_at)})
                     </p>
                   </div>
 
@@ -316,12 +317,12 @@ export default function TicketQueuePage() {
                   onChange={(e) => setSelectedCustId(e.target.value)}
                   className="w-full p-2 text-xs case-border rounded bg-paper text-ink font-mono focus:outline-none"
                 >
-                  <option value="CUST-4491">Lucas Vance (CUST-4491 - High Risk)</option>
-                  <option value="CUST-8021">Elena Rostova (CUST-8021 - High Risk)</option>
-                  <option value="CUST-5510">Sophia Chen (CUST-5510 - High Risk)</option>
-                  <option value="CUST-3312">Devon Miller (CUST-3312 - Watching)</option>
-                  <option value="CUST-9142">Marcus Sterling (CUST-9142 - Safe)</option>
-                  <option value="CUST-1049">Amara Thorne (CUST-1049 - Safe)</option>
+                  <option value="CUST-1000">Lucas Vance (CUST-1000 - High Risk)</option>
+                  <option value="CUST-1001">Elena Rostova (CUST-1001 - High Risk)</option>
+                  <option value="CUST-1002">Sophia Chen (CUST-1002 - High Risk)</option>
+                  <option value="CUST-1003">Devon Miller (CUST-1003 - Watching)</option>
+                  <option value="CUST-1004">Marcus Sterling (CUST-1004 - Safe)</option>
+                  <option value="CUST-1005">Amara Thorne (CUST-1005 - Safe)</option>
                 </select>
               </div>
 

@@ -12,6 +12,11 @@ from app.services.metrics import get_status_label
 
 router = APIRouter()
 
+def _format_iso_utc(dt: Optional[datetime]) -> Optional[str]:
+    if not dt:
+        return None
+    return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
+
 def compute_days_inactive(last_order_str: str) -> int:
     try:
         today = datetime.utcnow().date()
@@ -143,7 +148,7 @@ def get_customer(customer_id: str, db: Session = Depends(get_db)):
             "baseline_score": t.baseline_score,
             "fused_score": t.fused_score,
             "agent_reply": t.agent_reply,
-            "created_at": t.created_at.isoformat(),
+            "created_at": _format_iso_utc(t.created_at),
         }
         for t in tickets
     ]
@@ -162,8 +167,8 @@ def get_customer(customer_id: str, db: Session = Depends(get_db)):
             "urgency_score": o.urgency_score,
             "fused_score": o.fused_score,
             "status": o.status,
-            "created_at": o.created_at.isoformat(),
-            "decided_at": o.decided_at.isoformat() if o.decided_at else None,
+            "created_at": _format_iso_utc(o.created_at),
+            "decided_at": _format_iso_utc(o.decided_at),
         }
         for o in offers
     ]

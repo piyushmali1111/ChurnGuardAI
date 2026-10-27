@@ -1,5 +1,5 @@
 import uuid
-from typing import List
+from typing import List, Optional
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
@@ -12,6 +12,11 @@ from app.agents.orchestrator import run_agent_pipeline
 from app.services.settings_service import get_system_settings
 
 router = APIRouter()
+
+def _format_iso_utc(dt: Optional[datetime]) -> Optional[str]:
+    if not dt:
+        return None
+    return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
 
 def compute_days_inactive(last_order_str: str) -> int:
     try:
@@ -43,7 +48,7 @@ def list_tickets(limit: int = 100, db: Session = Depends(get_db)):
             "baseline_score": t.baseline_score,
             "fused_score": t.fused_score,
             "agent_reply": t.agent_reply,
-            "created_at": t.created_at.isoformat(),
+            "created_at": _format_iso_utc(t.created_at),
         })
     return res
 
@@ -151,7 +156,7 @@ def create_ticket(payload: TicketCreateRequest, db: Session = Depends(get_db)):
             "urgency_score": new_offer.urgency_score,
             "fused_score": new_offer.fused_score,
             "status": new_offer.status,
-            "created_at": new_offer.created_at.isoformat(),
+            "created_at": _format_iso_utc(new_offer.created_at),
         }
 
     return {
@@ -166,8 +171,9 @@ def create_ticket(payload: TicketCreateRequest, db: Session = Depends(get_db)):
             "baseline_score": ticket.baseline_score,
             "fused_score": ticket.fused_score,
             "agent_reply": ticket.agent_reply,
-            "created_at": ticket.created_at.isoformat(),
+            "created_at": _format_iso_utc(ticket.created_at),
         },
         "agent_reply": support_reply,
+        "agentReply": support_reply,
         "offer": created_offer,
     }

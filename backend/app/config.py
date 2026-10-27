@@ -11,6 +11,7 @@ else:
 
 class Settings(BaseSettings):
     GEMINI_API_KEY: str = os.getenv("GEMINI_API_KEY", "")
+    ENABLE_LIVE_LLM: bool = os.getenv("ENABLE_LIVE_LLM", "false").lower() == "true"
     DATABASE_URL: str = resolved_db_url
     FRONTEND_ORIGIN: str = os.getenv("FRONTEND_ORIGIN", "http://localhost:3000")
     MAX_DISCOUNT_PERCENT: int = int(os.getenv("MAX_DISCOUNT_PERCENT", "25"))

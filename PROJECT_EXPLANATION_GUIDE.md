@@ -1,6 +1,6 @@
-# 🎯 RetainIQ: Master Project Presentation & Viva Defense Guide
+# 🎯 ChurnGuardAI: Master Project Presentation & Viva Defense Guide
 
-> **Project Title:** RetainIQ: A Multi-Agent Agentic AI Framework for Real-Time Customer Churn Prediction and Autonomous Retention in E-Commerce  
+> **Project Title:** ChurnGuardAI: A Multi-Agent Agentic AI Framework for Real-Time Customer Churn Prediction and Autonomous Retention in E-Commerce  
 > **Tech Stack:** Next.js 14, TypeScript, Tailwind CSS, Recharts, Zustand, FastAPI (Python 3.12), SQLAlchemy, SQLite, Scikit-Learn, XGBoost, SMOTE, SHAP, VADER, LangGraph, Google Gemini 1.5/2.0 API, WebSockets, APScheduler.
 
 ---
@@ -38,7 +38,7 @@ In online retail (Shopify, Amazon brands, D2C fashion boutiques):
 
 ### ❌ Why Naive & Standard Solutions Fail
 
-| Traditional Solution | Why It Fails in Reality | How RetainIQ Fixes It |
+| Traditional Solution | Why It Fails in Reality | How ChurnGuardAI Fixes It |
 | :--- | :--- | :--- |
 | **Naive Solution 1: "We miss you!" Blanket Emails** | Sending automated 15% discount blasts to everyone who hasn't bought in 30 days costs thousands in wasted margin and trains loyal customers to wait for discounts. | **Targeted Precision:** Discounts are only generated for validated high-risk customers whose lifetime value justifies the coupon. |
 | **Naive Solution 2: Reactive Support Chatbots (Zendesk / Intercom)** | Support bots answer shipping questions like *"Where is my package?"*, but they have zero idea if the user has spent $2,000 or $10, or if this is their 4th late order. | **Context Fusion:** Fuses live customer sentiment with historical purchase history and lifetime spend. |
@@ -49,7 +49,7 @@ In online retail (Shopify, Amazon brands, D2C fashion boutiques):
 
 # 2. How We Solved It (The Big Picture)
 
-RetainIQ is a **Closed-Loop Multi-Agent Retention System** structured into three distinct layers:
+ChurnGuardAI is a **Closed-Loop Multi-Agent Retention System** structured into three distinct layers:
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
@@ -180,7 +180,7 @@ The frontend is styled in our custom **"Case File / Ledger"** design system: war
 
 ```
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
-│  RETAINIQ   [Run Proactive Scan]  [Simulate Live Ticket]                               │
+│  churnguardai   [Run Proactive Scan]  [Simulate Live Ticket]                               │
 ├─────────────────┬──────────────────┬──────────────────┬────────────────────────────────┤
 │ Total Customers │ High Risk Today  │ 30-Day Retention │ Pending Offers Approval        │
 │     4,850       │    14 Customers  │     91.4%        │         4 Offers Action Reqd   │
@@ -210,7 +210,7 @@ The frontend is styled in our custom **"Case File / Ledger"** design system: war
    - Triggers `POST /api/scan/run` to evaluate the entire database with the ML model and schedule retention offers for at-risk accounts without waiting for a support ticket.
 
 #### 🗣️ Exact Presentation Script:
-> *"Professors, this is the RetainIQ Executive Operations Dashboard. At a glance, an e-commerce manager sees their 4 primary health metrics. Notice our 8-week cohort retention curve plotted dynamically with Recharts. On the right, you see our live WebSocket agent stream—this is connected to our FastAPI server and updates in real time whenever background agents perform actions. With one click on 'Run Proactive Scan', the system scans all 4,850 customer records using our XGBoost/Logistic Regression model to find silent churners."*
+> *"Professors, this is the ChurnGuardAI Executive Operations Dashboard. At a glance, an e-commerce manager sees their 4 primary health metrics. Notice our 8-week cohort retention curve plotted dynamically with Recharts. On the right, you see our live WebSocket agent stream—this is connected to our FastAPI server and updates in real time whenever background agents perform actions. With one click on 'Run Proactive Scan', the system scans all 4,850 customer records using our XGBoost/Logistic Regression model to find silent churners."*
 
 ---
 
@@ -229,7 +229,7 @@ The frontend is styled in our custom **"Case File / Ledger"** design system: war
    - Allows examiners to pick any customer, type a custom angry or happy message, and watch the multi-agent pipeline execute live.
 
 #### 🗣️ Exact Presentation Script:
-> *"Here in the Ticket Queue, we demonstrate how RetainIQ handles incoming customer communications. Every ticket submitted is instantly parsed by our VADER sentiment engine. Notice the badges: tickets are not just classified as 'Angry' or 'Happy', but given an exact numeric urgency score from 0 to 100. When an angry ticket arrives, our system immediately links the customer's lifetime value from the database and passes it to the LangGraph swarm."*
+> *"Here in the Ticket Queue, we demonstrate how ChurnGuardAI handles incoming customer communications. Every ticket submitted is instantly parsed by our VADER sentiment engine. Notice the badges: tickets are not just classified as 'Angry' or 'Happy', but given an exact numeric urgency score from 0 to 100. When an angry ticket arrives, our system immediately links the customer's lifetime value from the database and passes it to the LangGraph swarm."*
 
 ---
 
@@ -299,7 +299,7 @@ The frontend is styled in our custom **"Case File / Ledger"** design system: war
 4. **Live Agent Activity Widget (Sidebar):** Shows the real-time reasoning trace from the Verifier Agent validating policy compliance.
 
 #### 🗣️ Exact Presentation Script:
-> *"This is the centerpiece of our governance architecture: the Human-in-the-Loop Approval Inbox. Unlike unsafe autonomous systems that might email a customer 50% off by mistake, RetainIQ holds generated offers in quarantine. The store manager can review the AI's reasoning, inspect the Gemini-generated copy, click 'Edit' to change the discount from 18% to 15%, or click 'Approve'. Once approved, the decision is logged to our outcome database to train future iterations of the model."*
+> *"This is the centerpiece of our governance architecture: the Human-in-the-Loop Approval Inbox. Unlike unsafe autonomous systems that might email a customer 50% off by mistake, ChurnGuardAI holds generated offers in quarantine. The store manager can review the AI's reasoning, inspect the Gemini-generated copy, click 'Edit' to change the discount from 18% to 15%, or click 'Approve'. Once approved, the decision is logged to our outcome database to train future iterations of the model."*
 
 ---
 
@@ -323,7 +323,7 @@ Follow this exact sequence in front of the professors. It presents a dramatic, h
 ---
 
 ### 🎬 Phase 1: The Baseline / Trivial Case (Zero Waste Demonstration)
-- **Goal:** Show that RetainIQ does **not** waste company money on low-risk customers.
+- **Goal:** Show that ChurnGuardAI does **not** waste company money on low-risk customers.
 - **Action:**
   1. Navigate to **Ticket Queue** (`/tickets`).
   2. Click **"Simulate Customer Ticket"**.
@@ -337,7 +337,7 @@ Follow this exact sequence in front of the professors. It presents a dramatic, h
   - Support Agent generates a helpful FAQ reply about Friday 4 PM shipping.
   - **ZERO discount is generated.** The Approval Inbox count stays at 0.
 - **🗣️ What to say to Faculty:**
-  > *"Notice what happened here, professors. The customer had a normal question. The Support Agent resolved it immediately. Because the Fused Risk was only 18, our system bypassed the Retention Agent completely. A naive system would have sent a blanket coupon and burned our profit margin. RetainIQ saved the merchant money."*
+  > *"Notice what happened here, professors. The customer had a normal question. The Support Agent resolved it immediately. Because the Fused Risk was only 18, our system bypassed the Retention Agent completely. A naive system would have sent a blanket coupon and burned our profit margin. ChurnGuardAI saved the merchant money."*
 
 ---
 

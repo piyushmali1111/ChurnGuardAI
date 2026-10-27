@@ -1,10 +1,10 @@
 @echo off
-title Stop RetainIQ Servers
+title Stop ChurnGuardAI Servers
 color 0E
 cls
 
 echo =====================================================================
-echo                STOPPING RETAINIQ SERVERS (Ports 8000 & 3000)         
+echo                STOPPING churnguardai SERVERS (Ports 8000 & 3000)         
 echo =====================================================================
 echo.
 
@@ -21,6 +21,6 @@ for /f "tokens=5" %%a in ('netstat -aon ^| findstr ":3000" ^| findstr "LISTENING
 )
 
 echo.
-echo [+] RetainIQ servers stopped successfully.
+echo [+] ChurnGuardAI servers stopped successfully.
 echo.
 pause

@@ -1,12 +1,17 @@
-from typing import List
+from typing import List, Optional
 from datetime import datetime
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.db.models import Offer, Customer
 from app.api.schemas import OfferResponse, OfferPatchRequest
 
 router = APIRouter()
+
+def _format_iso_utc(dt: Optional[datetime]) -> Optional[str]:
+    if not dt:
+        return None
+    return dt.strftime("%Y-%m-%dT%H:%M:%SZ")
 
 def _serialize_offer(o: Offer, customer_name: str = None) -> dict:
     return {
@@ -21,9 +26,22 @@ def _serialize_offer(o: Offer, customer_name: str = None) -> dict:
         "urgency_score": o.urgency_score,
         "fused_score": o.fused_score,
         "status": o.status,
-        "created_at": o.created_at.isoformat(),
-        "decided_at": o.decided_at.isoformat() if o.decided_at else None,
+        "created_at": _format_iso_utc(o.created_at),
+        "decided_at": _format_iso_utc(o.decided_at),
     }
+
+@router.get("", response_model=List[OfferResponse])
+@router.get("/", response_model=List[OfferResponse])
+def get_all_offers(status: Optional[str] = Query(None), db: Session = Depends(get_db)):
+    query = (
+        db.query(Offer, Customer.name)
+        .outerjoin(Customer, Offer.customer_id == Customer.id)
+    )
+    if status and status.lower() != "all":
+        query = query.filter(Offer.status.ilike(status.strip()))
+    
+    results = query.order_by(Offer.created_at.desc()).all()
+    return [_serialize_offer(o, cust_name) for o, cust_name in results]
 
 @router.get("/pending", response_model=List[OfferResponse])
 def get_pending_offers(db: Session = Depends(get_db)):

@@ -52,29 +52,24 @@ def run_support_agent(ticket_text: str, customer_name: str) -> str:
 
     candidate_reply = None
 
-    if api_key:
+    if api_key and settings.ENABLE_LIVE_LLM:
         try:
             from google import genai
-            client = genai.Client(api_key=api_key)
-            response = client.models.generate_content(
-                model="gemini-2.5-flash",
-                contents=system_instruction
-            )
-            if response and response.text:
-                candidate_reply = response.text.strip()
+            import concurrent.futures
 
-            # Post-generation guard check
-            if candidate_reply and contains_banned_commitment(candidate_reply):
-                retry_prompt = f"{system_instruction}\n\nIMPORTANT REVISION: Your previous draft contained an unauthorized commitment. Remove all commitments, discounts, and guarantees. You must only acknowledge and state the team is reviewing."
-                retry_resp = client.models.generate_content(
-                    model="gemini-2.5-flash",
-                    contents=retry_prompt
+            def _call_gemini():
+                client = genai.Client(api_key=api_key)
+                return client.models.generate_content(
+                    model="gemini-3.8-flash",
+                    contents=system_instruction
                 )
-                if retry_resp and retry_resp.text:
-                    candidate_reply = retry_resp.text.strip()
 
-        except Exception as e:
-            print(f"[!] Support Agent Gemini call failed: {e}. Using deterministic fallback.")
+            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as executor:
+                future = executor.submit(_call_gemini)
+                response = future.result(timeout=2.0)
+                if response and response.text:
+                    candidate_reply = response.text.strip()
+        except Exception:
             candidate_reply = None
 
     if not candidate_reply or contains_banned_commitment(candidate_reply):
